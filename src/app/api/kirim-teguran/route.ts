@@ -148,14 +148,30 @@ export async function POST(req: NextRequest) {
     if (error) throw new Error(error.message || "Gagal mengirim email");
 
     await db.insert(teguran).values({
-      nomorPolisi,
-      namaPemilik,
-      totalPembayaran,
-      nomorWa: email,
-      statusPengiriman: "terkirim",
-      petugasNama: petugasNama || null,
-      catatanOperasi: catatanOperasi || null,
-    });
+  nomorPolisi,
+  namaPemilik,
+  merk: merk || null,
+  type: type || null,
+  tahunBuat: tahunBuat || null,
+  warnaTnkb: warnaTnkb || null,
+  masaBerlaku: masaBerlaku || null,
+  pkb: pkb || null,
+  tunggakanPkb: tunggakanPkb || null,
+  dendaPkb: dendaPkb || null,
+  swdkllj: swdkllj || null,
+  tunggakanSwdkllj: tunggakanSwdkllj || null,
+  dendaSwdkllj: dendaSwdkllj || null,
+  opsenPkb: opsenPkb || null,
+  dendaOpsen: dendaOpsen || null,
+  tunggakanOpsen: tunggakanOpsen || null,
+  stnkStick: stnkStick || null,
+  platNomor: platNomor || null,
+  totalPembayaran,
+  nomorWa: email,
+  statusPengiriman: "terkirim",
+  petugasNama: petugasNama || null,
+  catatanOperasi: catatanOperasi || null,
+});
 
     return NextResponse.json({ success: true, message: "Teguran berhasil dikirim via Email" });
   } catch (error: any) {
