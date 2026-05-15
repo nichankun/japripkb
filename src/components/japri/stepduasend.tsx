@@ -12,7 +12,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 
 interface FormData {
   nomorPolisi: string;
@@ -108,6 +107,16 @@ export function Step2Send({
   const canSend =
     !isSending && !!form.nomorPolisi && !!form.namaPemilik && !!form.email;
 
+  // Optimasi: Handler khusus untuk Input guna memastikan tipe data aman (Type Safe)
+  const handleInputChange = (key: keyof FormData) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    onFormChange(key, e.target.value);
+  };
+
+  // Optimasi: Handler khusus untuk Textarea
+  const handleTextareaChange = (key: keyof FormData) => (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    onFormChange(key, e.target.value);
+  };
+
   return (
     <div className="space-y-4">
       {/* Page Header */}
@@ -138,7 +147,7 @@ export function Step2Send({
                   <FormField label="Nomor Polisi" required>
                     <Input
                       value={form.nomorPolisi}
-                      onChange={(e) => onFormChange("nomorPolisi", e.target.value)}
+                      onChange={handleInputChange("nomorPolisi")}
                       placeholder="DD 1234 ABC"
                       className="uppercase h-9 text-sm"
                     />
@@ -146,7 +155,7 @@ export function Step2Send({
                   <FormField label="Total Tunggakan" required>
                     <Input
                       value={form.totalPembayaran}
-                      onChange={(e) => onFormChange("totalPembayaran", e.target.value)}
+                      onChange={handleInputChange("totalPembayaran")}
                       placeholder="Rp 500.000"
                       className="h-9 text-sm"
                     />
@@ -155,7 +164,7 @@ export function Step2Send({
                 <FormField label="Nama Pemilik" required>
                   <Input
                     value={form.namaPemilik}
-                    onChange={(e) => onFormChange("namaPemilik", e.target.value)}
+                    onChange={handleInputChange("namaPemilik")}
                     placeholder="Nama sesuai STNK"
                     className="h-9 text-sm"
                   />
@@ -164,7 +173,7 @@ export function Step2Send({
                   <FormField label="Merk">
                     <Input
                       value={form.merk}
-                      onChange={(e) => onFormChange("merk", e.target.value)}
+                      onChange={handleInputChange("merk")}
                       placeholder="YAMAHA"
                       className="h-9 text-sm"
                     />
@@ -172,7 +181,7 @@ export function Step2Send({
                   <FormField label="Type">
                     <Input
                       value={form.type}
-                      onChange={(e) => onFormChange("type", e.target.value)}
+                      onChange={handleInputChange("type")}
                       placeholder="B6H-F A/T"
                       className="h-9 text-sm"
                     />
@@ -180,7 +189,7 @@ export function Step2Send({
                   <FormField label="Tahun Buat">
                     <Input
                       value={form.tahunBuat}
-                      onChange={(e) => onFormChange("tahunBuat", e.target.value)}
+                      onChange={handleInputChange("tahunBuat")}
                       placeholder="2023"
                       className="h-9 text-sm"
                     />
@@ -188,7 +197,7 @@ export function Step2Send({
                   <FormField label="Warna TNKB">
                     <Input
                       value={form.warnaTnkb}
-                      onChange={(e) => onFormChange("warnaTnkb", e.target.value)}
+                      onChange={handleInputChange("warnaTnkb")}
                       placeholder="Putih"
                       className="h-9 text-sm"
                     />
@@ -197,7 +206,7 @@ export function Step2Send({
                 <FormField label="Masa Berlaku">
                   <Input
                     value={form.masaBerlaku}
-                    onChange={(e) => onFormChange("masaBerlaku", e.target.value)}
+                    onChange={handleInputChange("masaBerlaku")}
                     placeholder="13-06-2026"
                     className="h-9 text-sm"
                   />
@@ -217,7 +226,7 @@ export function Step2Send({
                   <FormField key={key} label={label}>
                     <Input
                       value={form[key]}
-                      onChange={(e) => onFormChange(key, e.target.value)}
+                      onChange={handleInputChange(key)}
                       placeholder="0"
                       className="h-9 text-sm"
                     />
@@ -239,7 +248,7 @@ export function Step2Send({
               <FormField label="Email Penerima" required>
                 <Input
                   value={form.email}
-                  onChange={(e) => onFormChange("email", e.target.value)}
+                  onChange={handleInputChange("email")}
                   placeholder="email@example.com"
                   type="email"
                   className="h-9 text-sm"
@@ -248,7 +257,7 @@ export function Step2Send({
               <FormField label="Nama Petugas">
                 <Input
                   value={form.petugasNama}
-                  onChange={(e) => onFormChange("petugasNama", e.target.value)}
+                  onChange={handleInputChange("petugasNama")}
                   placeholder="Nama petugas operasi"
                   className="h-9 text-sm"
                 />
@@ -256,7 +265,7 @@ export function Step2Send({
               <FormField label="Catatan Operasi">
                 <Textarea
                   value={form.catatanOperasi}
-                  onChange={(e) => onFormChange("catatanOperasi", e.target.value)}
+                  onChange={handleTextareaChange("catatanOperasi")}
                   placeholder="Lokasi operasi, kondisi, dll..."
                   className="resize-none text-sm"
                   rows={4}

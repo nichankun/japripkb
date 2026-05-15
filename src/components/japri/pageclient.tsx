@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { ClipboardList } from "lucide-react";
@@ -88,14 +88,23 @@ export function JapriClient() {
   const [ocrDone, setOcrDone] = useState(false);
   const [form, setForm] = useState<FormData>(EMPTY_FORM);
 
+  // Membersihkan object URL saat komponen di-unmount untuk mencegah memory leak
+  useEffect(() => {
+    return () => {
+      if (preview) URL.revokeObjectURL(preview);
+    };
+  }, [preview]);
+
   // ---- Handlers ----
   const handleFile = (f: File) => {
+    if (preview) URL.revokeObjectURL(preview); // Bersihkan preview lama
     setFile(f);
     setPreview(URL.createObjectURL(f));
     setOcrDone(false);
   };
 
   const handleClearFile = () => {
+    if (preview) URL.revokeObjectURL(preview); // Bersihkan preview dari memori
     setPreview(null);
     setFile(null);
     setOcrDone(false);
@@ -113,13 +122,19 @@ export function JapriClient() {
       const fd = new FormData();
       fd.append("image", file);
       const res = await fetch("/api/ocr", { method: "POST", body: fd });
+      
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Gagal melakukan proses OCR");
+      }
+      
       const data: OcrResult = await res.json();
-      if (!res.ok) throw new Error((data as any).error);
       setForm((prev) => ({ ...prev, ...data }));
       setOcrDone(true);
       toast.success("OCR Berhasil!", { description: "Data berhasil diekstrak." });
-    } catch (e: any) {
-      toast.error("OCR Gagal", { description: e.message });
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Terjadi kesalahan tidak dikenal";
+      toast.error("OCR Gagal", { description: errorMessage });
     } finally {
       setIsScanning(false);
     }
@@ -134,16 +149,21 @@ export function JapriClient() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
+      
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Gagal mengirim teguran");
+      }
+      
       toast.success("Teguran Terkirim!", {
         description: `Email berhasil dikirim ke ${form.email}`,
       });
       setForm(EMPTY_FORM);
       handleClearFile();
       setStep(1);
-    } catch (e: any) {
-      toast.error("Pengiriman Gagal", { description: e.message });
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Terjadi kesalahan tidak dikenal";
+      toast.error("Pengiriman Gagal", { description: errorMessage });
     } finally {
       setIsSending(false);
     }

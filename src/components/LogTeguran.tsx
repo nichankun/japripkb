@@ -17,6 +17,7 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
+  DrawerDescription // Optimasi: Menambahkan import DrawerDescription untuk aksesibilitas
 } from "@/components/ui/drawer";
 import {
   Loader2,
@@ -157,9 +158,11 @@ export default function LogTeguran() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState<Teguran | null>(null);
+  const [error, setError] = useState<string | null>(null); // State error handling
 
   // Simple media query — true = desktop (md+)
   const [isDesktop, setIsDesktop] = useState(false);
+  
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 768px)");
     setIsDesktop(mq.matches);
@@ -168,11 +171,23 @@ export default function LogTeguran() {
     return () => mq.removeEventListener("change", handler);
   }, []);
 
+  // Optimasi: Fetch API dengan penanganan error yang lebih aman (Type Safe + Fallback)
   useEffect(() => {
-    fetch("/api/log-teguran")
-      .then((r) => r.json())
-      .then((d) => setData(d))
-      .finally(() => setLoading(false));
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const r = await fetch("/api/log-teguran");
+        if (!r.ok) throw new Error("Gagal mengambil data log");
+        const d: Teguran[] = await r.json();
+        setData(d);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Terjadi kesalahan yang tidak diketahui");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
   const totalPages = Math.ceil(data.length / PAGE_SIZE);
@@ -183,6 +198,16 @@ export default function LogTeguran() {
       <div className="flex items-center justify-center py-20 text-muted-foreground">
         <Loader2 className="w-5 h-5 animate-spin mr-2" />
         <span className="text-sm">Memuat log...</span>
+      </div>
+    );
+  }
+  
+  // Handling jika terjadi error saat memuat data
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-destructive">
+        <p className="text-sm font-semibold">Gagal memuat log</p>
+        <p className="text-xs">{error}</p>
       </div>
     );
   }
@@ -323,8 +348,8 @@ export default function LogTeguran() {
             <DialogHeader>
               <DialogTitle className="text-base">{dialogTitle}</DialogTitle>
                <DialogDescription className="sr-only">
-      Deskripsi dialog
-    </DialogDescription>
+                Detail riwayat teguran untuk kendaraan {selected?.nomorPolisi}
+               </DialogDescription>
             </DialogHeader>
             {selected && <DetailContent item={selected} />}
           </DialogContent>
@@ -337,6 +362,10 @@ export default function LogTeguran() {
           <DrawerContent className="max-h-[90vh]">
             <DrawerHeader className="pb-2">
               <DrawerTitle className="text-base text-left">{dialogTitle}</DrawerTitle>
+              {/* Optimasi Aksesibilitas: Menambahkan DrawerDescription yang wajib pada versi terbaru shadcn */}
+              <DrawerDescription className="sr-only">
+                Detail riwayat teguran untuk kendaraan {selected?.nomorPolisi}
+              </DrawerDescription>
             </DrawerHeader>
             <div className="overflow-y-auto px-4 pb-6">
               {selected && <DetailContent item={selected} />}

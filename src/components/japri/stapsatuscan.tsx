@@ -94,7 +94,8 @@ export function Step1Scan({
 }: Step1ScanProps) {
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const handleDrop = (e: React.DragEvent) => {
+  // Optimasi 1: Memberikan strict type pada event React untuk HTMLDivElement
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     const f = e.dataTransfer.files[0];
     if (f && f.type.startsWith("image/")) onFile(f);
@@ -119,6 +120,7 @@ export function Step1Scan({
         >
           {preview ? (
             <div className="relative">
+              {/* Catatan: Tag <img> standar sudah sangat tepat untuk URL.createObjectURL (blob) di Next.js */}
               <img
                 src={preview}
                 alt="Preview"
@@ -164,13 +166,14 @@ export function Step1Scan({
           type="file"
           accept="image/*"
           className="hidden"
-          onChange={(e) => {
+          // Optimasi 2: Memberikan strict type pada event Change untuk HTMLInputElement
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             const f = e.target.files?.[0];
             if (f) onFile(f);
           }}
         />
 
-        {/* Action Buttons */}
+        {/* Action Buttons - Komponen ini sudah benar dan akan otomatis mengikuti preset jika globals.css sudah ter-update */}
         <div className="flex gap-2">
           <Button
             onClick={onScan}

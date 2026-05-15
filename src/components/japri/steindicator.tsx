@@ -10,8 +10,9 @@ interface Step {
 
 interface StepIndicatorProps {
   currentStep: number;
-  steps: Step[];
-  completedSteps: number[];
+  // Optimasi: Memastikan array bersifat Readonly agar lebih aman dan mencegah mutasi data yang tidak disengaja
+  steps: ReadonlyArray<Step>;
+  completedSteps: ReadonlyArray<number>;
 }
 
 export function StepIndicator({ currentStep, steps, completedSteps }: StepIndicatorProps) {

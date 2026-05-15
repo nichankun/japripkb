@@ -4,7 +4,8 @@ import { ScanLine } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-type ActiveTab = "kirim" | "log";
+// Optimasi: Menambahkan export agar tipe ini bisa di-reuse/di-import di pageclient.tsx atau file lain
+export type ActiveTab = "kirim" | "log";
 
 interface AppHeaderProps {
   activeTab: ActiveTab;
@@ -12,6 +13,11 @@ interface AppHeaderProps {
 }
 
 export function AppHeader({ activeTab, onTabChange }: AppHeaderProps) {
+  // Handler untuk memastikan tipe data tab aman (Type Safe) saat onValueChange dipanggil
+  const handleTabChange = (value: string) => {
+    onTabChange(value as ActiveTab);
+  };
+
   return (
     <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
       <div className="container max-w-5xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
@@ -35,7 +41,7 @@ export function AppHeader({ activeTab, onTabChange }: AppHeaderProps) {
         </div>
 
         {/* Tab Navigation */}
-        <Tabs value={activeTab} onValueChange={(v) => onTabChange(v as ActiveTab)}>
+        <Tabs value={activeTab} onValueChange={handleTabChange}>
           <TabsList className="h-8">
             <TabsTrigger value="kirim" className="text-xs px-4 h-7">
               Kirim Teguran
