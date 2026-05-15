@@ -46,20 +46,6 @@ interface Step2SendProps {
   onSend: () => void;
 }
 
-const biayaFields: { label: string; key: keyof FormData }[] = [
-  { label: "PKB", key: "pkb" },
-  { label: "Tunggakan PKB", key: "tunggakanPkb" },
-  { label: "Denda PKB", key: "dendaPkb" },
-  { label: "SWDKLLJ", key: "swdkllj" },
-  { label: "Tunggakan SWDKLLJ", key: "tunggakanSwdkllj" },
-  { label: "Denda SWDKLLJ", key: "dendaSwdkllj" },
-  { label: "Opsen PKB", key: "opsenPkb" },
-  { label: "Denda Opsen", key: "dendaOpsen" },
-  { label: "Tunggakan Opsen", key: "tunggakanOpsen" },
-  { label: "STNK / STICK", key: "stnkStick" },
-  { label: "Plat Nomor / DT", key: "platNomor" },
-];
-
 function FieldGroup({
   label,
   children,
@@ -107,12 +93,10 @@ export function Step2Send({
   const canSend =
     !isSending && !!form.nomorPolisi && !!form.namaPemilik && !!form.email;
 
-  // Optimasi: Handler khusus untuk Input guna memastikan tipe data aman (Type Safe)
   const handleInputChange = (key: keyof FormData) => (e: React.ChangeEvent<HTMLInputElement>) => {
     onFormChange(key, e.target.value);
   };
 
-  // Optimasi: Handler khusus untuk Textarea
   const handleTextareaChange = (key: keyof FormData) => (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onFormChange(key, e.target.value);
   };
@@ -134,12 +118,12 @@ export function Step2Send({
 
       {/* Two-column on desktop */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Left: Kendaraan + Biaya */}
+        {/* Left: Kendaraan (Read Only) */}
         <div className="space-y-4">
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm">Data Kendaraan</CardTitle>
-              <CardDescription>Informasi kendaraan dari STNK</CardDescription>
+              <CardDescription>Informasi kendaraan dari STNK (Terkunci)</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <FieldGroup label="Identitas Kendaraan">
@@ -147,97 +131,76 @@ export function Step2Send({
                   <FormField label="Nomor Polisi" required>
                     <Input
                       value={form.nomorPolisi}
-                      onChange={handleInputChange("nomorPolisi")}
+                      readOnly
                       placeholder="DD 1234 ABC"
-                      className="uppercase h-9 text-sm"
+                      className="uppercase h-9 text-sm bg-muted/50 cursor-default focus-visible:ring-0"
                     />
                   </FormField>
                   <FormField label="Total Tunggakan" required>
                     <Input
                       value={form.totalPembayaran}
-                      onChange={handleInputChange("totalPembayaran")}
+                      readOnly
                       placeholder="Rp 500.000"
-                      className="h-9 text-sm"
+                      className="h-9 text-sm bg-muted/50 cursor-default focus-visible:ring-0"
                     />
                   </FormField>
                 </div>
                 <FormField label="Nama Pemilik" required>
                   <Input
                     value={form.namaPemilik}
-                    onChange={handleInputChange("namaPemilik")}
+                    readOnly
                     placeholder="Nama sesuai STNK"
-                    className="h-9 text-sm"
+                    className="h-9 text-sm bg-muted/50 cursor-default focus-visible:ring-0"
                   />
                 </FormField>
                 <div className="grid grid-cols-2 gap-3">
                   <FormField label="Merk">
                     <Input
                       value={form.merk}
-                      onChange={handleInputChange("merk")}
+                      readOnly
                       placeholder="YAMAHA"
-                      className="h-9 text-sm"
+                      className="h-9 text-sm bg-muted/50 cursor-default focus-visible:ring-0"
                     />
                   </FormField>
                   <FormField label="Type">
                     <Input
                       value={form.type}
-                      onChange={handleInputChange("type")}
+                      readOnly
                       placeholder="B6H-F A/T"
-                      className="h-9 text-sm"
+                      className="h-9 text-sm bg-muted/50 cursor-default focus-visible:ring-0"
                     />
                   </FormField>
                   <FormField label="Tahun Buat">
                     <Input
                       value={form.tahunBuat}
-                      onChange={handleInputChange("tahunBuat")}
+                      readOnly
                       placeholder="2023"
-                      className="h-9 text-sm"
+                      className="h-9 text-sm bg-muted/50 cursor-default focus-visible:ring-0"
                     />
                   </FormField>
                   <FormField label="Warna TNKB">
                     <Input
                       value={form.warnaTnkb}
-                      onChange={handleInputChange("warnaTnkb")}
+                      readOnly
                       placeholder="Putih"
-                      className="h-9 text-sm"
+                      className="h-9 text-sm bg-muted/50 cursor-default focus-visible:ring-0"
                     />
                   </FormField>
                 </div>
                 <FormField label="Masa Berlaku">
                   <Input
                     value={form.masaBerlaku}
-                    onChange={handleInputChange("masaBerlaku")}
+                    readOnly
                     placeholder="13-06-2026"
-                    className="h-9 text-sm"
+                    className="h-9 text-sm bg-muted/50 cursor-default focus-visible:ring-0"
                   />
                 </FormField>
               </FieldGroup>
             </CardContent>
           </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm">Informasi Biaya</CardTitle>
-              <CardDescription>Rincian tagihan dan tunggakan</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-3">
-                {biayaFields.map(({ label, key }) => (
-                  <FormField key={key} label={label}>
-                    <Input
-                      value={form[key]}
-                      onChange={handleInputChange(key)}
-                      placeholder="0"
-                      className="h-9 text-sm"
-                    />
-                  </FormField>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
-        {/* Right: Pengiriman */}
+        {/* Right: Pengiriman (Editable) */}
         <div className="space-y-4">
           <Card>
             <CardHeader className="pb-3">
